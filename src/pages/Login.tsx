@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/hooks/useAuth'
 import { Heart } from 'lucide-react'
 
 export default function Login() {
@@ -7,6 +9,8 @@ export default function Login() {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const { demoMode, signInDemo, setDemoRole } = useAuth()
+  const navigate = useNavigate()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,6 +25,12 @@ export default function Login() {
     if (error) setError(error.message)
     else setSent(true)
     setLoading(false)
+  }
+
+  const handleDemo = (role: 'anhorig' | 'brukare') => {
+    setDemoRole(role)
+    signInDemo()
+    navigate(role === 'anhorig' ? '/dashboard' : '/today')
   }
 
   return (
@@ -39,7 +49,48 @@ export default function Login() {
           </p>
         </div>
 
-        {sent ? (
+        {demoMode ? (
+          <div className="space-y-4 fade-in">
+            <div className="text-center mb-6">
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-medium">
+                Demo-läge — ingen databas ansluten
+              </span>
+            </div>
+
+            <button
+              onClick={() => handleDemo('anhorig')}
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-cc-accent to-cc-accent2
+                text-cc-bg font-semibold text-base hover:opacity-90 transition-opacity touch-target"
+            >
+              Logga in som Dena (anhörig)
+            </button>
+
+            <button
+              onClick={() => handleDemo('brukare')}
+              className="w-full py-4 rounded-xl border border-cc-accent/30
+                text-cc-accent font-semibold text-base hover:bg-cc-accent/5 transition-colors touch-target"
+            >
+              Visa Fatimah-läge (brukare)
+            </button>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-cc-border" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-cc-bg px-3 text-cc-muted">eller</span>
+              </div>
+            </div>
+
+            <a
+              href="/staff"
+              className="block w-full py-3.5 rounded-xl border border-cc-border text-center
+                text-cc-muted hover:border-cc-accent hover:text-cc-accent transition-colors touch-target"
+            >
+              Jag är personal → Ange kod
+            </a>
+          </div>
+        ) : sent ? (
           <div className="text-center fade-in">
             <div className="w-16 h-16 rounded-full bg-cc-accent/10 flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">✉️</span>
@@ -95,7 +146,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Staff shortcut */}
             <a
               href="/staff"
               className="block w-full py-3.5 rounded-xl border border-cc-border text-center

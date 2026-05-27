@@ -2,21 +2,28 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { Schedule, GREETINGS } from '@/lib/types'
+import { MOCK_SCHEDULES, MOCK_BRUKARE } from '@/lib/mock-data'
 import { Clock, User, HelpCircle, Check } from 'lucide-react'
 
 export default function TodayView() {
-  const { profile } = useAuth()
+  const { profile, demoMode } = useAuth()
   const [schedules, setSchedules] = useState<Schedule[]>([])
   const [loading, setLoading] = useState(true)
   const [acknowledged, setAcknowledged] = useState(false)
 
   const brukareId = profile?.role === 'brukare' ? profile.id : profile?.linked_brukare_id
-  const brukareProfile = profile?.role === 'brukare' ? profile : null
+  const brukareProfile = profile?.role === 'brukare' ? profile : (demoMode ? MOCK_BRUKARE : null)
   const lang = brukareProfile?.primary_language || profile?.primary_language || 'sv'
   const greeting = GREETINGS[lang] || GREETINGS.sv
   const name = brukareProfile?.name || profile?.name || ''
 
   useEffect(() => {
+    if (demoMode) {
+      setSchedules(MOCK_SCHEDULES)
+      setLoading(false)
+      return
+    }
+
     if (!brukareId) return
 
     const today = new Date().toISOString().split('T')[0]
@@ -35,7 +42,6 @@ export default function TodayView() {
 
     fetchSchedules()
 
-    // Realtime subscription — updates when Dena changes schedule
     const channel = supabase
       .channel('today-schedules')
       .on('postgres_changes', {
@@ -47,7 +53,7 @@ export default function TodayView() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [brukareId])
+  }, [brukareId, demoMode])
 
   const now = new Date()
   const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`

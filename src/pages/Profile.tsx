@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { Profile as ProfileType, LANGUAGE_OPTIONS } from '@/lib/types'
+import { MOCK_BRUKARE } from '@/lib/mock-data'
 import { ChevronLeft, Edit2, Save, MapPin, Heart, Pill, AlertTriangle } from 'lucide-react'
 
 export default function Profile() {
-  const { profile: myProfile, user, refreshProfile } = useAuth()
+  const { profile: myProfile, user, refreshProfile, demoMode } = useAuth()
   const [brukare, setBrukare] = useState<ProfileType | null>(null)
   const [editing, setEditing] = useState(false)
   const [editData, setEditData] = useState<Partial<ProfileType>>({})
@@ -15,12 +16,17 @@ export default function Profile() {
   const brukareId = myProfile?.role === 'brukare' ? myProfile.id : myProfile?.linked_brukare_id
 
   useEffect(() => {
+    if (demoMode) {
+      setBrukare(MOCK_BRUKARE)
+      setEditData(MOCK_BRUKARE)
+      return
+    }
     if (!brukareId) return
     supabase.from('profiles').select('*').eq('id', brukareId).single()
       .then(({ data }) => {
         if (data) { setBrukare(data as ProfileType); setEditData(data) }
       })
-  }, [brukareId])
+  }, [brukareId, demoMode])
 
   const handleSave = async () => {
     if (!brukareId) return

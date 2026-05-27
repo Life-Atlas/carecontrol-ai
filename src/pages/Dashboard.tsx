@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { Schedule, Visit } from '@/lib/types'
+import { MOCK_SCHEDULES, MOCK_VISITS, MOCK_BRUKARE } from '@/lib/mock-data'
 import { Calendar, User, Star, Settings, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 
 export default function Dashboard() {
-  const { profile, signOut } = useAuth()
+  const { profile, signOut, demoMode } = useAuth()
   const [schedules, setSchedules] = useState<Schedule[]>([])
   const [recentVisits, setRecentVisits] = useState<Visit[]>([])
   const [brukareProfile, setBrukareProfile] = useState<any>(null)
@@ -15,6 +16,14 @@ export default function Dashboard() {
   const brukareId = profile?.linked_brukare_id
 
   useEffect(() => {
+    if (demoMode) {
+      setSchedules(MOCK_SCHEDULES)
+      setRecentVisits(MOCK_VISITS)
+      setBrukareProfile(MOCK_BRUKARE)
+      setLoading(false)
+      return
+    }
+
     if (!brukareId) { setLoading(false); return }
 
     const load = async () => {
@@ -39,7 +48,6 @@ export default function Dashboard() {
 
     load()
 
-    // Realtime
     const channel = supabase
       .channel('dashboard')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'schedules', filter: `brukare_id=eq.${brukareId}` }, () => load())
@@ -47,7 +55,7 @@ export default function Dashboard() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [brukareId])
+  }, [brukareId, demoMode])
 
   if (loading) {
     return <div className="min-h-screen bg-cc-bg flex items-center justify-center"><p className="text-cc-accent animate-pulse">Laddar...</p></div>
