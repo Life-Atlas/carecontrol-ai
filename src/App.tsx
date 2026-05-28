@@ -7,6 +7,7 @@ import Dashboard from '@/pages/Dashboard'
 import Schedule from '@/pages/Schedule'
 import Profile from '@/pages/Profile'
 import StaffView from '@/pages/StaffView'
+import WeekView from '@/pages/WeekView'
 
 function AppRoutes() {
   const { session, profile, loading } = useAuth()
@@ -45,6 +46,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/today" element={<TodayView />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/week" element={<WeekView />} />
         <Route path="*" element={<Navigate to="/today" replace />} />
       </Routes>
     )
@@ -57,6 +59,7 @@ function AppRoutes() {
       <Route path="/schedule" element={<Schedule />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/today" element={<TodayView />} />
+      <Route path="/week" element={<WeekView />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

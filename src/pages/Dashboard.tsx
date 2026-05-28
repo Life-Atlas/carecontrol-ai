@@ -205,8 +205,8 @@ export default function Dashboard() {
         <Link to="/dashboard" className="flex flex-col items-center gap-1 text-cc-accent">
           <Clock className="w-5 h-5" /><span className="text-xs">Hem</span>
         </Link>
-        <Link to="/schedule" className="flex flex-col items-center gap-1 text-cc-muted hover:text-cc-text">
-          <Calendar className="w-5 h-5" /><span className="text-xs">Schema</span>
+        <Link to="/week" className="flex flex-col items-center gap-1 text-cc-muted hover:text-cc-text">
+          <Calendar className="w-5 h-5" /><span className="text-xs">Veckan</span>
         </Link>
         <Link to="/profile" className="flex flex-col items-center gap-1 text-cc-muted hover:text-cc-text">
           <User className="w-5 h-5" /><span className="text-xs">Profil</span>
