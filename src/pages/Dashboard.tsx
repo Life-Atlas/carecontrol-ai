@@ -3,8 +3,38 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { Schedule, Visit } from '@/lib/types'
-import { MOCK_SCHEDULES, MOCK_VISITS, MOCK_BRUKARE } from '@/lib/mock-data'
-import { Calendar, User, Star, Settings, Plus, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { MOCK_SCHEDULES, MOCK_VISITS, MOCK_BRUKARE, getWeekVisits } from '@/lib/mock-data'
+import { getStaffColor, getStaffInitials } from '@/lib/translations'
+import { Calendar, User, Star, Settings, Plus, Clock, CheckCircle, AlertCircle, Phone, Users } from 'lucide-react'
+
+const KONTAKTPERSON = { name: 'Parisa', role: 'Kontaktperson', phone: '070-123 45 67' }
+
+function dateStr(daysOffset: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() + daysOffset)
+  return d.toISOString().split('T')[0]
+}
+
+function StaffAvatar({ name, size = 'sm' }: { name: string; size?: 'sm' | 'md' }) {
+  const color = getStaffColor(name)
+  const initials = getStaffInitials(name)
+  const cls = size === 'md' ? 'w-10 h-10 text-sm' : 'w-8 h-8 text-xs'
+  return (
+    <div
+      className={`${cls} rounded-full flex items-center justify-center font-bold flex-shrink-0`}
+      style={{ backgroundColor: `${color}22`, border: `2px solid ${color}`, color }}
+      title={name}
+    >
+      {initials}
+    </div>
+  )
+}
+
+function moodToEmoji(mood: string | null): string {
+  if (mood === 'happy') return '😊'
+  if (mood === 'sad') return '😔'
+  return '😐'
+}
 
 export default function Dashboard() {
   const { profile, signOut, demoMode } = useAuth()
@@ -67,6 +97,22 @@ export default function Dashboard() {
   const completedToday = schedules.filter(s => s.status === 'completed').length
   const totalToday = schedules.length
 
+  // Continuity: unique staff from past 7 days
+  const weekVisits = demoMode ? getWeekVisits(-7, 0) : recentVisits
+  const uniqueWeekStaff = Array.from(new Set(weekVisits.map(v => v.staff_name).filter(Boolean))) as string[]
+
+  // Mood strip: last 5 visit moods
+  const last5Moods = (demoMode ? MOCK_VISITS : recentVisits).slice(-5).map(v => v.mood_emoji)
+
+  // Tomorrow's schedule
+  const tomorrowDate = dateStr(1)
+  const tomorrowSchedules = demoMode
+    ? MOCK_SCHEDULES.filter(s => s.date === tomorrowDate)
+    : []
+
+  // Most recent completed visit
+  const latestVisit = (demoMode ? MOCK_VISITS : recentVisits).slice(-1)[0] ?? null
+
   return (
     <div className="min-h-screen bg-cc-bg pb-24">
       {/* Header */}
@@ -101,6 +147,35 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Mood strip */}
+        {last5Moods.length > 0 && (
+          <div className="flex items-center gap-3 px-1">
+            <span className="text-xs text-cc-muted flex-shrink-0">Humör senast</span>
+            <div className="flex gap-1">
+              {last5Moods.map((m, i) => (
+                <span key={i} className="text-xl leading-none">{moodToEmoji(m)}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Continuity card */}
+        <div className="p-4 rounded-xl bg-cc-surface border border-cc-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Users className="w-4 h-4 text-cc-muted" />
+            <span className="text-sm font-medium text-cc-text">Personal denna vecka</span>
+            <span className="ml-auto text-xs text-cc-muted">{uniqueWeekStaff.length} olika</span>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {uniqueWeekStaff.map(name => (
+              <div key={name} className="flex items-center gap-1.5">
+                <StaffAvatar name={name} />
+                <span className="text-xs text-cc-muted">{name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Today's schedule */}
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -121,7 +196,6 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-2">
               {schedules.map(s => {
-                const isPast = s.time_start < currentTime
                 const isActive = s.status === 'active'
                 const isDone = s.status === 'completed'
 
@@ -137,6 +211,7 @@ export default function Dashboard() {
                       </span>
                     </div>
 
+                    <StaffAvatar name={s.staff_name || 'Personal'} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium truncate">{s.staff_name || 'Personal'}</span>
@@ -156,34 +231,82 @@ export default function Dashboard() {
           )}
         </div>
 
+        {/* Tomorrow preview */}
+        {tomorrowSchedules.length > 0 && (
+          <div>
+            <h2 className="font-semibold text-cc-text mb-3">Imorgon</h2>
+            <div className="space-y-2">
+              {tomorrowSchedules.map(s => (
+                <div key={s.id} className="p-3 rounded-xl bg-cc-surface border border-cc-border flex items-center gap-3">
+                  <div className="w-12 text-center flex-shrink-0">
+                    <span className="text-sm font-bold text-cc-muted">{s.time_start.slice(0, 5)}</span>
+                  </div>
+                  <StaffAvatar name={s.staff_name || 'Personal'} />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium truncate block">{s.staff_name || 'Personal'}</span>
+                    <div className="flex gap-1 mt-0.5 flex-wrap">
+                      {s.tasks.map(t => (
+                        <span key={t} className="px-1.5 py-0.5 rounded bg-cc-surface2 text-cc-muted text-xs">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Recent visits */}
-        {recentVisits.length > 0 && (
+        {(demoMode ? MOCK_VISITS : recentVisits).length > 0 && (
           <div>
             <h2 className="font-semibold text-cc-text mb-3">Senaste besök</h2>
             <div className="space-y-2">
-              {recentVisits.map(v => (
-                <div key={v.id} className="p-4 rounded-xl bg-cc-surface border border-cc-border">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{v.staff_name || 'Personal'}</p>
+              {/* Most recent — prominent with staff note */}
+              {latestVisit && (
+                <div className="p-4 rounded-xl bg-cc-surface border border-cc-accent/40">
+                  <div className="flex items-center gap-3 mb-2">
+                    <StaffAvatar name={latestVisit.staff_name || 'Personal'} size="md" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold">{latestVisit.staff_name || 'Personal'}</p>
+                      <p className="text-xs text-cc-muted">
+                        {latestVisit.checkin_at && new Date(latestVisit.checkin_at).toLocaleDateString('sv-SE')}
+                        {latestVisit.checkin_at && latestVisit.checkout_at && ` · ${Math.round((new Date(latestVisit.checkout_at).getTime() - new Date(latestVisit.checkin_at).getTime()) / 60000)} min`}
+                      </p>
+                    </div>
+                    {latestVisit.mood_emoji && (
+                      <span className="text-3xl">{moodToEmoji(latestVisit.mood_emoji)}</span>
+                    )}
+                  </div>
+                  {latestVisit.staff_notes && (
+                    <p className="text-sm text-cc-text/80 italic border-l-2 border-cc-accent/50 pl-3 mt-1">
+                      "{latestVisit.staff_notes}"
+                    </p>
+                  )}
+                  {latestVisit.tasks_completed.length > 0 && (
+                    <div className="flex gap-1.5 mt-2 flex-wrap">
+                      {latestVisit.tasks_completed.map(t => (
+                        <span key={t} className="px-2 py-0.5 rounded bg-green-500/10 text-green-400 text-xs">{t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* Rest compact */}
+              {(demoMode ? MOCK_VISITS : recentVisits).slice(-5, -1).reverse().map(v => (
+                <div key={v.id} className="p-3 rounded-xl bg-cc-surface border border-cc-border">
+                  <div className="flex items-center gap-3">
+                    <StaffAvatar name={v.staff_name || 'Personal'} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{v.staff_name || 'Personal'}</p>
                       <p className="text-xs text-cc-muted">
                         {v.checkin_at && new Date(v.checkin_at).toLocaleDateString('sv-SE')}
                         {v.checkin_at && v.checkout_at && ` · ${Math.round((new Date(v.checkout_at).getTime() - new Date(v.checkin_at).getTime()) / 60000)} min`}
                       </p>
                     </div>
                     {v.mood_emoji && (
-                      <span className="text-2xl">
-                        {v.mood_emoji === 'happy' ? '😊' : v.mood_emoji === 'neutral' ? '😐' : '😔'}
-                      </span>
+                      <span className="text-xl">{moodToEmoji(v.mood_emoji)}</span>
                     )}
                   </div>
-                  {v.tasks_completed.length > 0 && (
-                    <div className="flex gap-1.5 mt-2">
-                      {v.tasks_completed.map(t => (
-                        <span key={t} className="px-2 py-0.5 rounded bg-green-500/10 text-green-400 text-xs">{t}</span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -199,6 +322,22 @@ export default function Dashboard() {
             </p>
           </div>
         )}
+
+        {/* Kontaktperson */}
+        <div className="p-4 rounded-xl bg-cc-surface border border-cc-border flex items-center gap-4">
+          <StaffAvatar name={KONTAKTPERSON.name} size="md" />
+          <div className="flex-1">
+            <p className="text-xs text-cc-muted">{KONTAKTPERSON.role}</p>
+            <p className="font-semibold text-cc-text">{KONTAKTPERSON.name}</p>
+          </div>
+          <a
+            href={`tel:${KONTAKTPERSON.phone.replace(/\s/g, '')}`}
+            className="w-10 h-10 rounded-xl bg-cc-accent/10 flex items-center justify-center"
+            aria-label={`Ring ${KONTAKTPERSON.name}`}
+          >
+            <Phone className="w-5 h-5 text-cc-accent" />
+          </a>
+        </div>
       </div>
 
       {/* Bottom nav */}
