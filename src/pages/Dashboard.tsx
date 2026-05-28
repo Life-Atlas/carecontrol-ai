@@ -17,8 +17,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (demoMode) {
-      setSchedules(MOCK_SCHEDULES)
-      setRecentVisits(MOCK_VISITS)
+      const today = new Date().toISOString().split('T')[0]
+      setSchedules(MOCK_SCHEDULES.filter(s => s.date === today))
+      setRecentVisits(MOCK_VISITS.slice(-5))
       setBrukareProfile(MOCK_BRUKARE)
       setLoading(false)
       return
