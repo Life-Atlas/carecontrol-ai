@@ -1,8 +1,10 @@
 # CareControl AI
 
-**A Life Atlas module for elderly home care coordination.**
+**AI-driven care coordination for Swedish hemtjänst (home care).**
 
 Puts control back in the hands of the older person and their family — no municipal system integration needed.
+
+**[Live Demo](https://life-atlas.github.io/carecontrol-ai/)** · [User Stories (51)](https://life-atlas.github.io/carecontrol-ai/docs/user-stories.html) · [Source Documents (OneDrive)](https://winniioio-my.sharepoint.com/:f:/g/personal/ceo_winniio_io/IgC3DhhVVtC4R6RaAX6M1Uv4ARVmDyzTxkzgzMeUeack6Gs)
 
 ## The Problem
 
@@ -16,57 +18,66 @@ An app where Dena enters the schedule, Fatimah sees "who's coming today" in her 
 
 No API integrations. No municipal procurement. Just a phone and a 4-digit code.
 
+## Current Build (v2 — May 2026)
+
+| View | What's There |
+|------|-------------|
+| **Fatimah (TodayView)** | Full Persian UI, time-aware greeting, TTS (reads schedule aloud), staff avatars, 4 wish buttons, Hjälp button |
+| **Dena (Dashboard)** | Today's schedule, mood strip, continuity card, tomorrow preview, kontaktperson card, week view |
+| **Profile** | Editable care passport, emergency card (Nödinfo), language selector (10 languages), medications/allergies |
+| **Staff** | 4-digit code entry, full brukare profile, task checklist, mood rating, notes |
+
+**Demo mode** — runs entirely without a backend. Auto-detected when no Supabase is configured.
+
 ## Quick Start
 
 ```bash
-# 1. Clone
-git clone https://github.com/lifeatlas/carecontrol-ai.git
+git clone https://github.com/Life-Atlas/carecontrol-ai.git
 cd carecontrol-ai
-
-# 2. Install
 npm install
-
-# 3. Configure
-cp .env.example .env.local
-# Edit .env.local with your Supabase project URL and anon key
-
-# 4. Database
-# Paste supabase/migrations/*.sql into your Supabase SQL Editor (in order)
-
-# 5. Run
 npm run dev
 ```
 
+No `.env` needed — demo mode activates automatically with rich mock data.
+
 ## Tech Stack
 
-- React + TypeScript + Vite
-- Tailwind CSS
-- Supabase (Postgres, Auth, Edge Functions, Realtime)
-- Anthropic Claude API (translation)
-- Twilio (voice calls — Stage 3)
+- React 19 + TypeScript + Vite 6
+- Tailwind CSS 3
+- Supabase (Postgres, Auth, RLS, Realtime) — when connected
+- Web Speech API (TTS, no backend needed)
+- GitHub Pages deploy (`npm run deploy`)
 
 ## Project Structure
 
 ```
 src/
-  pages/        → Login, Onboarding, TodayView, Dashboard, Schedule, Profile, StaffView
+  pages/        → TodayView, Dashboard, Profile, StaffView, Login, Schedule
   hooks/        → useAuth (context provider)
-  lib/          → supabase client, types, constants
-supabase/
-  migrations/   → SQL schema files
-  functions/    → Edge Functions (translation, etc.)
+  lib/          → supabase client, types, mock-data, translations (i18n + TTS)
+docs/
+  user-stories.html  → 51 stories from 4 source documents
+  sessions/          → development session logs
 ```
 
-## Development
+## User Stories
 
-See **CLAUDE_CODE_TASKS.md** for the full task queue. Each task is a self-contained prompt for Claude Code or any AI coding agent.
+51 stories across 12 epics, extracted from:
+1. Nicolas & Dena transcript (27 May 2026)
+2. Dena's structured report
+3. Market landscape strategy
+4. Sahlgrenska hackathon pitch deck
 
-## Stages
+Status: **12 BUILT** · 8 PARTIAL · 19 MISSING · 12 FUTURE
 
-1. **Core** (Weeks 1-2): Schedule + Today View + Staff View
-2. **Translation + Ratings** (Weeks 3-4): Real-time translation + rating system
-3. **Viral + Agent** (Weeks 5-8): Invite flow + AI morning calls
-4. **Revenue** (Weeks 9-16): Premium subscriptions + provider dashboards
+[View all stories →](https://life-atlas.github.io/carecontrol-ai/docs/user-stories.html)
+
+## Regulatory Context
+
+- **språkkrav** (Gers B2) effective July 1, 2026
+- **personalkontinuitetsmått** due Oct 2027
+- Public ratings at utförare level only, ≥7 respondent threshold (GDPR/IMY)
+- Zero-integration architecture: AI agent calls kontaktperson directly
 
 ## License
 
