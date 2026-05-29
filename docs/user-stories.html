@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareControl AI — User Stories</title>
+<style>
+  :root { --bg: #0a0e1a; --surface: #141827; --border: #1e2538; --text: #e8eaf0; --muted: #6b7394; --accent: #00d4aa; --warn: #f59e0b; --danger: #ef4444; --blue: #00b4d8; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.4rem; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); color: var(--accent); }
+  h3 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; color: var(--blue); }
+  .meta { color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+  .summary { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; }
+  .stat { text-align: center; padding: 1rem; border-radius: 8px; background: var(--bg); }
+  .stat .num { font-size: 2rem; font-weight: 800; }
+  .stat .label { font-size: 0.8rem; color: var(--muted); }
+  .built .num { color: var(--accent); }
+  .partial .num { color: var(--warn); }
+  .missing .num { color: var(--danger); }
+  .future .num { color: var(--blue); }
+
+  .story { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.75rem; }
+  .story-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+  .story-id { font-family: monospace; font-size: 0.8rem; color: var(--muted); min-width: 52px; }
+  .story-title { font-weight: 600; flex: 1; }
+  .badge { padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-built { background: rgba(0,212,170,0.15); color: var(--accent); }
+  .badge-partial { background: rgba(245,158,11,0.15); color: var(--warn); }
+  .badge-missing { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .badge-future { background: rgba(0,180,216,0.15); color: var(--blue); }
+  .badge-kano { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-left: 4px; }
+  .badge-mustbe { background: rgba(239,68,68,0.1); color: #f87171; }
+  .badge-perf { background: rgba(245,158,11,0.1); color: #fbbf24; }
+  .badge-exciter { background: rgba(168,85,247,0.1); color: #c084fc; }
+  .story-body { font-size: 0.9rem; color: var(--muted); padding-left: 3.7rem; }
+  .story-source { font-size: 0.75rem; color: var(--muted); opacity: 0.7; margin-top: 0.25rem; padding-left: 3.7rem; }
+  .story-source em { color: var(--text); font-style: normal; opacity: 0.6; }
+
+  .epic-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
+  blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+  th { text-align: left; padding: 8px 12px; background: var(--surface); color: var(--accent); border-bottom: 2px solid var(--border); }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .persona { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; }
+  .p-brukare { background: rgba(0,212,170,0.1); color: var(--accent); }
+  .p-anhorig { background: rgba(0,180,216,0.1); color: var(--blue); }
+  .p-staff { background: rgba(245,158,11,0.1); color: var(--warn); }
+  .p-system { background: rgba(168,85,247,0.1); color: #c084fc; }
+</style>
+</head>
+<body>
+
+<h1>CareControl AI — User Stories</h1>
+<p class="meta">
+  Extracted from: Nicolas &amp; Dena transcript (27 May 2026) | Dena's report | Market landscape strategy | Sahlgrenska pitch deck<br>
+  Cross-referenced against current build (v0.1 demo, live at life-atlas.github.io/carecontrol-ai)<br>
+  Generated: 28 May 2026
+</p>
+
+<div class="summary">
+  <strong>Scoreboard: Current Build vs. Full Vision</strong>
+  <div class="summary-grid">
+    <div class="stat built"><div class="num">12</div><div class="label">BUILT</div></div>
+    <div class="stat partial"><div class="num">8</div><div class="label">PARTIAL</div></div>
+    <div class="stat missing"><div class="num">19</div><div class="label">MISSING (v0.1-v0.4)</div></div>
+    <div class="stat future"><div class="num">12</div><div class="label">FUTURE (v0.5+)</div></div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<h2>Personas</h2>
+<!-- ============================================ -->
+
+<table>
+<tr><th>Persona</th><th>Real person</th><th>Description</th></tr>
+<tr><td><span class="persona p-brukare">Brukare</span></td><td>Fatimah</td><td>84, Persian-speaking, hemtjanst 3x/day, no written schedule, lost control over her day</td></tr>
+<tr><td><span class="persona p-anhorig">Anhorig</span></td><td>Dena</td><td>Fatimah's daughter, worked in hemtjanst herself, lives elsewhere, no contact number for hemtjanst</td></tr>
+<tr><td><span class="persona p-staff">Kontaktperson</span></td><td>Parisa</td><td>Persian-speaking hemtjanst kontaktperson, holds all planning info, only person Fatimah can communicate with</td></tr>
+<tr><td><span class="persona p-staff">Personal</span></td><td>(rotating)</td><td>16 different staff in 14 days (national avg), no info about brukare before arriving</td></tr>
+<tr><td><span class="persona p-system">AI Agent</span></td><td>CareControl</td><td>Calls kontaktperson, extracts schedule, translates, briefs everyone — no hemtjanst IT integration needed</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>Epic 1: Brukare Knows What's Happening <span class="badge badge-kano badge-mustbe">Must-be</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc">The core problem from the transcript: <em>"Ingen har kontroll. Det bara hander. Det bara kommer folk. Det bara kommer folk och oppnar dorren."</em> — Dena</p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-001</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I can see today's schedule on a tablet in the hallway so I know who is coming and when</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">TodayView shows next visit with time, staff name, and tasks. Large font, Persian greeting, RTL support.</div>
+  <div class="story-source"><em>Transcript 00:00:</em> "Hon vet inte vad som hander. Hon har inte kontroll." | <em>Transcript 01:27:</em> "padda, iPad eller vad som helst"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-002</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I see the schedule in my own language (Persian) so I understand without help</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Persian greeting works. But schedule content (task names, staff names, notes) is still in Swedish. Needs full content translation.</div>
+  <div class="story-source"><em>Transcript 04:48:</em> "Din mamma kan prata pa persiska. AI:n tolkar direkt." | <em>Dena report:</em> "rostassistent" + "tydligt sprak"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-003</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I see WHO is coming (with a photo if possible) so I'm not startled by strangers</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Staff name is shown. Photo is missing — only a generic person icon. Transcript explicitly mentions photo: "har du nagon bild pa vem du nu ar som kommer?"</div>
+  <div class="story-source"><em>Transcript 14:06:</em> "har du nagon bild pa vem du nu ar som kommer?" | <em>Transcript 10:49:</em> "en morkhyad kille som var ledig" — stranger arriving caused distress</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-004</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I get a notification when staff is delayed so I don't worry</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Delay status badge exists on schedule cards (yellow "Forsenad"). But there's no push notification, no audio alert, no "Sara ar 10 min sen, hon ar pa vag" message.</div>
+  <div class="story-source"><em>Transcript 00:00:</em> "Parisa, hon kommer vara forsenad. Eller 40 minuter forsenad. Da far mamma en notis." | <em>Dena report:</em> "Sara ar ungefar tio minuter sen. Hon ar pa vag."</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-005</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I can hear today's plan read aloud so I don't need to read the screen</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No text-to-speech. The transcript vision is an AI agent that calls Fatimah: "den ringa till mamma. Pa persiska. Hej Fatima, jag precis pratat med Parisa. Det har kommer handa."</div>
+  <div class="story-source"><em>Transcript 12:12:</em> "kan den ringa till mamma. Pa persiska." | <em>Dena report:</em> "mojlighet att fa information upplast" + "rostassistent"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-006</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I can express what I want help with today so staff knows before arriving</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No wish/request feature. Transcript: "Jag vill ha hjalp att duscha. Jag vill ga ner pa stan." The brukare should be able to state preferences for the day.</div>
+  <div class="story-source"><em>Transcript 13:23:</em> "Har ar det jag vill fa gjort idag." — Dena's validation moment | <em>Dena report:</em> "Kan jag onska dusch lite senare?"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-007</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I can ask simple questions by voice: "Vem kommer idag?", "Nar ar nasta besok?"</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No voice input, no NLP, no conversational interface. This is a core differentiator from Dena's report.</div>
+  <div class="story-source"><em>Dena report:</em> "Brukaren kan fraga: Vem kommer idag? Nar kommer nasta besok? Vad ska jag fa hjalp med idag?"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-008</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> As Fatimah, I can press one big button to say "I'm OK" or "I need help" so I feel heard</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">OK and Hjalp buttons in TodayView. Oversized (py-6), accessible. But Hjalp button doesn't actually do anything yet — no alert is sent.</div>
+  <div class="story-source"><em>Design decision from build session</em></div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 2: Anhorig Has Visibility <span class="badge badge-kano badge-mustbe">Must-be</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc">Dena's pain: <em>"Jag har inte hennes nummer"</em> (can't reach kontaktperson), <em>"Nej jag far inte"</em> (doesn't receive the weekly plan).</p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-009</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I see today's schedule for mamma and who is coming</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">Dashboard shows today's visits with time, staff name, tasks, and status. Stats row: total/completed/remaining.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-010</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I see the week's history — what happened, who came, how mamma felt</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">WeekView "Veckan som gatt" tab shows 7-day history with mood emojis, staff notes, status badges, unique staff count.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-011</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I see upcoming scheduled visits so I know what's planned</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">WeekView "Kommande" tab shows 2 days of upcoming visits.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-012</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I get push notifications when someone arrives or when there's a delay</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No push notifications. No PWA service worker. Market landscape: "Family app showing today's schedule + push notifications when someone arrives."</div>
+  <div class="story-source"><em>Market landscape 8.4:</em> "Family app (Dena) showing today's schedule + push notifications when someone arrives"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-013</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I see mamma's care passport (medications, allergies, preferences, life story)</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">Profile page shows full care passport with all fields.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-014</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I can edit mamma's care information (medications, preferences, life story)</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">Profile is read-only. No edit capability. Data comes from mock data or Supabase — no form to update it.</div>
+  <div class="story-source"><em>Transcript 11:35:</em> "Life Atlas fragar lite fragor... De matar informationen de har basic sjalv."</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-015</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I control what information is shared with hemtjanst staff</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No consent/sharing controls. Transcript: "Vad du valjer att den ska visa, fine. Det ar upp till dig." Currently all data is visible to anyone with the access code.</div>
+  <div class="story-source"><em>Transcript 03:49:</em> "Det ar upp till dig om du inte vill visa medicinerna" | <em>Transcript 14:49:</em> "Om Parisa ringer sa far du dela med dig av den har informationen"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-016</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I have a single direct number/channel to reach kontaktperson (Parisa)</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">The transcript reveals Dena doesn't even have Parisa's phone number. CareControl should store the kontaktperson's contact and enable direct communication.</div>
+  <div class="story-source"><em>Transcript 11:17:</em> "Jag har inte hennes nummer."</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 3: Staff Arrives Prepared <span class="badge badge-kano badge-mustbe">Must-be</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc">Nicolas's vision: <em>"De har paddan dar. De loggar in. De trycker pa play, de har aldrig traffat Fatima innan. Och dar ser de da, men hon foddes har och gjorde de har grejerna."</em></p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-017</span>
+    <span class="story-title"><span class="persona p-staff">Personal</span> As hemtjanst staff, I enter a 4-digit code at brukare's door to access their profile</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">StaffView has full numpad code entry. No auth required — code lookup against profiles table.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-018</span>
+    <span class="story-title"><span class="persona p-staff">Personal</span> As new staff who never met Fatimah, I see her life story, birthplace, languages, allergies, medications</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">StaffView shows: name, birthplace, language flags, allergies (red warning), medications, life story, preferences.</div>
+  <div class="story-source"><em>Transcript 01:27:</em> "de trycker pa play... dar ser de da, men hon foddes har och gjorde de har grejerna"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-019</span>
+    <span class="story-title"><span class="persona p-staff">Personal</span> As staff, I see today's tasks as a checklist and mark them done during the visit</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">StaffView has interactive task checklist with green checkmarks, notes field, checkin/checkout buttons.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-020</span>
+    <span class="story-title"><span class="persona p-staff">Personal</span> As staff, I see an AI briefing before each visit: recent events, risks, wishes from brukare/family</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No AI summary. The Visit type has an ai_summary field but it's always null. Dena's report: "Nasta besok: Anna, 84 ar. Vid gardagens kvallsbesok var Anna orolig... Hon at lite daligt igar. Paminn om vatska. Observera fallrisk."</div>
+  <div class="story-source"><em>Dena report line 51:</em> AI summary example with risk warnings + previous visit context</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-021</span>
+    <span class="story-title"><span class="persona p-staff">Personal</span> As staff, the tablet translates between me (Swedish) and Fatimah (Persian) in real-time</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No translation capability. This is the "tolk" — the central metaphor of the entire product.</div>
+  <div class="story-source"><em>Transcript 03:05:</em> "Det blir som en tolk. Det blir som din mammas tolk mot hemtjansten." | <em>Market landscape 8.5:</em> Performance feature v0.2-v0.4</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-022</span>
+    <span class="story-title"><span class="persona p-staff">Personal</span> As staff, I can record a visit note by voice and get an AI documentation draft</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">Text notes exist in StaffView but no voice input, no AI documentation generation.</div>
+  <div class="story-source"><em>Dena report line 74:</em> "personalen tala in en kort anteckning. AI-agenten skapar ett dokumentationsforslag"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-023</span>
+    <span class="story-title"><span class="persona p-staff">Personal</span> As staff, I rate the visit conditions (briefing quality, home safety, enough time)</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">Market landscape defines bidirectional feedback: worker rates conditions too, generating data for anti-minutstyrning arguments.</div>
+  <div class="story-source"><em>Market landscape 2D:</em> Worker-side feedback on briefing quality, home safety, genomforandeplan quality, time adequacy</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 4: AI Agent — Schedule Extraction <span class="badge badge-kano badge-mustbe">Must-be</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc">The key architectural insight: <em>"Det ar ingen integration som behovs med hemtjansten. Du bara ringer och far den har informationen."</em> — Nicolas</p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-024</span>
+    <span class="story-title"><span class="persona p-system">System</span> AI agent calls kontaktperson (Parisa) every morning to extract today's schedule</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">This is the "Parisa pattern" — the product's zero-integration architecture. No API needed, just an AI that calls and asks.</div>
+  <div class="story-source"><em>Transcript 07:58:</em> "En AI-agent som ringer varje morgon. Vem ar det som kommer idag? Mamma behover ju inte gora nagonting."</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-025</span>
+    <span class="story-title"><span class="persona p-system">System</span> AI agent calls Fatimah in Persian with the day's plan after extracting it</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">"Hej Fatima, jag precis pratat med Parisa. Det har kommer handa..." — delivered in Persian via phone call.</div>
+  <div class="story-source"><em>Transcript 12:12:</em> "kan den ringa till mamma. Pa persiska."</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-026</span>
+    <span class="story-title"><span class="persona p-system">System</span> Onboarding asks 5 questions: brukare name, kontaktperson name, their phone number, language, kommun</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Onboarding page exists but doesn't collect kontaktperson info. Nicolas: "Du bara svarar pa fem fragor. Life Atlas fixar ju resten sen."</div>
+  <div class="story-source"><em>Transcript 11:35:</em> "Vilken handledare har du? Okej, vad ar det for telefonnummer? Ja, Life Atlas fixar allting."</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-027</span>
+    <span class="story-title"><span class="persona p-system">System</span> Family can manually enter the weekly planning document when AI calling isn't available</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Schedule page exists with basic add functionality, but it's bare — no import from planning doc, no recurring schedules.</div>
+  <div class="story-source"><em>Transcript 05:12:</em> "Jag kan hamta planeringen. Du lagger planeringen som din dator. Och sen bygger du pa grund av den har planeringen."</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 5: Visit Rating System <span class="badge badge-kano badge-exciter">Exciter</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc">The Glassdoor-for-hemtjanst layer. Not the core value (that's schedule visibility) but the viral mechanic that drives adoption. Provider-level public only, never name individual workers publicly.</p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-028</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> After each visit, I tap one of three emojis to rate: did you feel safe? understand each other? get all help?</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Mood emoji rating exists in StaffView (staff rates on behalf), but not in brukare's TodayView. Should be 3 dimensions per Market landscape, not just mood.</div>
+  <div class="story-source"><em>Market landscape 2A:</em> Three dimensions: trygg? forstod ni varandra? fick du hjalp?</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-029</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> I can mark a staff member as "favorit" (private) or "vill inte traffa igen" (private)</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No favorit/avoid mechanism. This is private feedback to the utforare, not public.</div>
+  <div class="story-source"><em>Market landscape 2A:</em> "One-tap favorit" + "One-tap vill inte traffa igen"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-030</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> I can leave a voice note in any language after a visit</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No voice recording capability. Market landscape specifies AI transcription + translation + sentiment tagging.</div>
+  <div class="story-source"><em>Market landscape 2A:</em> "Optional voice note in any language... AI transcribes, translates, tags sentiment + topic"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-031</span>
+    <span class="story-title"><span class="persona p-system">System</span> Public utforare profile pages with aggregate scores (>=7 respondent threshold)</span>
+    <span class="badge badge-future">FUTURE v0.5+</span>
+  </div>
+  <div class="story-body">Glassdoor mechanic: aggregate score, continuity metric, reliability, communication quality, language badges, right of reply.</div>
+  <div class="story-source"><em>Market landscape 2C + Legal section:</em> Provider-level only, >=7 threshold, never name individuals</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-032</span>
+    <span class="story-title"><span class="persona p-system">System</span> Shareable rating cards and kommun-comparison newsletter</span>
+    <span class="badge badge-future">FUTURE v0.5+</span>
+  </div>
+  <div class="story-body">"Min mammas hemtjanst har 4.2 — kolla din!" Deep-link cards + monthly kommun ranking shift.</div>
+  <div class="story-source"><em>Market landscape 3:</em> Viral mechanic modeled on Glassdoor launch</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 6: Continuity & Pattern Detection <span class="badge badge-kano badge-perf">Performance</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc">ML-driven insights from Dena's report: eating patterns, fall risk, repeated questions, scheduling patterns.</p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-033</span>
+    <span class="story-title"><span class="persona p-system">System</span> Auto-compute continuity score: unique staff faces per 14 days (benchmark: national avg 16)</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">WeekView shows unique staff count for 7 days. But no 14-day window, no benchmark comparison, no trend line.</div>
+  <div class="story-source"><em>Market landscape 2B:</em> "continuity score (faces per 14 days)" | <em>Socialstyrelsen mått due Dec 2026</em></div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-034</span>
+    <span class="story-title"><span class="persona p-system">System</span> Flag when brukare has eaten poorly multiple days, or asks repeated questions (predictive analysis)</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No pattern detection. Dena's report: "Anna har atit mindre an vanligt tre dagar i rad. Folj upp maltid och vatska."</div>
+  <div class="story-source"><em>Dena report line 70:</em> Predictive analysis example</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-035</span>
+    <span class="story-title"><span class="persona p-system">System</span> Detect scheduling patterns: visits that often run over time, times when delays cluster</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">"Besok hos denna brukare tar ofta 15 minuter langre pa duschdagar." — ML on visit duration data.</div>
+  <div class="story-source"><em>Dena report line 65:</em> ML scheduling pattern example</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-036</span>
+    <span class="story-title"><span class="persona p-anhorig">Anhorig</span> As Dena, I see a trend dashboard: mamma's mood over time, visit reliability, continuity</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">WeekView has basic stats but no trends, no graphs, no actionable insights over time.</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 7: Life Atlas Integration <span class="badge badge-kano badge-mustbe">Must-be</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc"><em>"Allting ar Life Atlas i bakgrunden. Life Atlas samlar fran hennes smarta armband. Den har hela hennes historik."</em> — Nicolas</p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-037</span>
+    <span class="story-title"><span class="persona p-system">System</span> CareControl stores brukare data in Life Atlas backend (medications, history, contacts, wearable data)</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Data model exists (Profile type with medications, allergies, life_story, preferences). But stored in CareControl's own tables, not integrated with Life Atlas.</div>
+  <div class="story-source"><em>Transcript 12:12:</em> "allting ar Life Atlas i bakgrunden... All medicin, allting!"</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-038</span>
+    <span class="story-title"><span class="persona p-system">System</span> Consent layer: brukare/family controls exactly what Parisa and staff can see via Life Atlas</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No granular consent. Nicolas: "mamma har sagt, om Parisa ringer sa far du dela med dig av den har informationen."</div>
+  <div class="story-source"><em>Transcript 14:49:</em> Consent-based sharing model</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 8: Accessibility & Elderly UX <span class="badge badge-kano badge-mustbe">Must-be</span></h2>
+<!-- ============================================ -->
+<p class="epic-desc">Dena's report: <em>"roststyrning, tydligt sprak, stora knappar och mojlighet att fa information upplast"</em></p>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-039</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> Extra-large fonts (4rem time, 2.5rem greeting), huge touch targets (56px+), high contrast</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">brukare-mode CSS class applies large fonts. Touch targets are py-6 (56px+). Dark theme with high contrast.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-040</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> RTL layout support for Persian/Arabic speakers</span>
+    <span class="badge badge-built">BUILT</span>
+  </div>
+  <div class="story-body">dir="rtl" applied on Persian greeting. Language detection in TodayView.</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-041</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> Voice control — navigate and interact without touching the screen</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">No Web Speech API, no voice navigation. Critical for elderly with limited mobility or vision.</div>
+  <div class="story-source"><em>Dena report:</em> "roststyrning" listed as key accessibility feature</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-042</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> 10 language support for the full interface (sv, fa, ar, so, ti, en, pl, da, ku, es)</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Greetings exist for all 10 languages. But UI chrome (button labels, nav items, section headers) is Swedish only.</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 9: Emergency & Safety <span class="badge badge-kano badge-perf">Performance</span></h2>
+<!-- ============================================ -->
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-043</span>
+    <span class="story-title"><span class="persona p-brukare">Brukare</span> Emergency info card: when ambulance arrives, tablet shows medications, allergies, conditions, emergency contacts</span>
+    <span class="badge badge-partial">PARTIAL</span>
+  </div>
+  <div class="story-body">Profile page has medications + allergies. But no dedicated emergency mode, no lock-screen card, no "show this to paramedics" view. Dena specifically flagged this use case.</div>
+  <div class="story-source"><em>Transcript 04:07:</em> "Det har kommer vara nar ambulansen kommer och hon ar sjuk. Da kan det har vara viktigt."</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-044</span>
+    <span class="story-title"><span class="persona p-system">System</span> Hjalp button sends alert to Dena and/or kontaktperson when Fatimah presses it</span>
+    <span class="badge badge-missing">MISSING</span>
+  </div>
+  <div class="story-body">Hjalp button exists in TodayView but is non-functional — no alert routing.</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 10: B2G / Kommun Dashboard <span class="badge badge-kano badge-exciter">Exciter</span></h2>
+<!-- ============================================ -->
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-045</span>
+    <span class="story-title"><span class="persona p-system">System</span> Kommun dashboard: real-time satisfaction across all utforare, sprakkrav compliance, continuity metric</span>
+    <span class="badge badge-future">FUTURE v0.5+</span>
+  </div>
+  <div class="story-source"><em>Market landscape 7:</em> B2G tier at 5-20 kr / brukare / month</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-046</span>
+    <span class="story-title"><span class="persona p-system">System</span> B2B Verified: utforare dashboard with analytics, right of reply, kvalitetsuppfoljning replacement</span>
+    <span class="badge badge-future">FUTURE v0.5+</span>
+  </div>
+  <div class="story-source"><em>Market landscape 7:</em> B2B tier at 25-50 kr / brukare / month</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-047</span>
+    <span class="story-title"><span class="persona p-system">System</span> Sprakkrav compliance tracking: % of visits where "Forstod ni varandra?" = positive</span>
+    <span class="badge badge-future">FUTURE v0.5+</span>
+  </div>
+  <div class="story-source"><em>Market landscape 5:</em> 1 July 2026 sprakkrav, Socialstyrelsen matt due Dec 2026</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 11: Voice Clone & Personalization <span class="badge badge-kano badge-exciter">Exciter</span></h2>
+<!-- ============================================ -->
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-048</span>
+    <span class="story-title"><span class="persona p-system">System</span> Voice-clone option: Fatimah hears the daily plan in Dena's voice (with explicit consent)</span>
+    <span class="badge badge-future">FUTURE v0.5+</span>
+  </div>
+  <div class="story-source"><em>Transcript 09:30:</em> "du kan klona hennes rost" | <em>Market landscape caveat:</em> requires explicit voice-consent capture</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-049</span>
+    <span class="story-title"><span class="persona p-system">System</span> AI learns brukare's preferences over time (Anna likes promenad before lunch, wants plan read after frukost)</span>
+    <span class="badge badge-future">FUTURE v0.5+</span>
+  </div>
+  <div class="story-source"><em>Dena report line 140:</em> Personcentrerad omsorg — AI learns individual patterns</div>
+</div>
+
+<!-- ============================================ -->
+<h2>Epic 12: Multi-language Live Translation <span class="badge badge-kano badge-perf">Performance</span></h2>
+<!-- ============================================ -->
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-050</span>
+    <span class="story-title"><span class="persona p-system">System</span> Real-time Swedish <-> Persian translation during visits via the tablet</span>
+    <span class="badge badge-future">FUTURE v0.2-v0.4</span>
+  </div>
+  <div class="story-body">The "tolk" metaphor. Staff speaks Swedish, Fatimah hears Persian. Fatimah speaks Persian, staff hears Swedish.</div>
+  <div class="story-source"><em>Transcript 04:48:</em> "Det kan ju vara en tolk... Din mamma kan prata pa persiska. AI:n tolkar direkt."</div>
+</div>
+
+<div class="story">
+  <div class="story-header">
+    <span class="story-id">CC-051</span>
+    <span class="story-title"><span class="persona p-system">System</span> Genomforandeplan read-aloud for staff in their language</span>
+    <span class="badge badge-future">FUTURE v0.2-v0.4</span>
+  </div>
+  <div class="story-source"><em>Market landscape 8.6:</em> Performance feature v0.2-v0.4</div>
+</div>
+
+<!-- ============================================ -->
+<hr class="divider">
+<h2>Priority Matrix: What to Build Next</h2>
+<!-- ============================================ -->
+
+<table>
+<tr><th>#</th><th>Story</th><th>Priority</th><th>Effort</th><th>Why now</th></tr>
+<tr><td>CC-002</td><td>Full content translation (tasks, notes in Persian)</td><td style="color:var(--danger)">P0</td><td>S</td><td>Core promise — "tolk" — only greeting is translated</td></tr>
+<tr><td>CC-003</td><td>Staff photos</td><td style="color:var(--danger)">P0</td><td>S</td><td>Strangers at the door caused real distress</td></tr>
+<tr><td>CC-004</td><td>Delay notifications (in-app + audio)</td><td style="color:var(--danger)">P0</td><td>M</td><td>Dena's #1 pain: 40-min delay with no info</td></tr>
+<tr><td>CC-005</td><td>Text-to-speech for daily plan</td><td style="color:var(--danger)">P0</td><td>M</td><td>Fatimah can't read — TTS is essential, not nice-to-have</td></tr>
+<tr><td>CC-006</td><td>Brukare wishes ("vad vill jag ha hjalp med idag")</td><td style="color:var(--warn)">P1</td><td>M</td><td>Dena's validation moment: "Det ar den har jag behover"</td></tr>
+<tr><td>CC-012</td><td>Push notifications for Dena</td><td style="color:var(--warn)">P1</td><td>M</td><td>Anhorig needs real-time awareness, not manual checking</td></tr>
+<tr><td>CC-014</td><td>Editable care passport</td><td style="color:var(--warn)">P1</td><td>M</td><td>Currently read-only mock data — useless for real pilot</td></tr>
+<tr><td>CC-020</td><td>AI visit briefing for staff</td><td style="color:var(--warn)">P1</td><td>L</td><td>Differentiator vs. blank genomforandeplan</td></tr>
+<tr><td>CC-026</td><td>Onboarding: collect kontaktperson info</td><td style="color:var(--warn)">P1</td><td>S</td><td>Required for the Parisa-pattern to work</td></tr>
+<tr><td>CC-027</td><td>Manual schedule entry (recurring, from planning doc)</td><td style="color:var(--warn)">P1</td><td>M</td><td>Without this, demo uses only mock data</td></tr>
+<tr><td>CC-044</td><td>Hjalp button sends real alert</td><td style="color:var(--warn)">P1</td><td>S</td><td>Button exists but does nothing — broken promise</td></tr>
+<tr><td>CC-024</td><td>AI agent calls kontaktperson</td><td style="color:var(--blue)">P2</td><td>XL</td><td>The zero-integration architecture — needs voice AI infra</td></tr>
+<tr><td>CC-028</td><td>3-dimension rating on brukare side</td><td style="color:var(--blue)">P2</td><td>M</td><td>Exciter — viral mechanic, but not must-be</td></tr>
+<tr><td>CC-043</td><td>Emergency info card</td><td style="color:var(--blue)">P2</td><td>S</td><td>Dena flagged ambulance use case explicitly</td></tr>
+</table>
+
+<p style="color:var(--muted); margin-top: 2rem; font-size: 0.85rem;">
+  <strong>Effort key:</strong> S = small (1-2 hrs), M = medium (half day), L = large (1-2 days), XL = extra large (1+ week, needs infra)<br>
+  <strong>Sources:</strong> Transcript = Nicolas &amp; Dena conversation 27 May 2026 | Dena report = CareControl AI course paper | Market landscape = Product strategy document | Build = Current v0.1 demo code
+</p>
+
+</body>
+</html>
